@@ -1,34 +1,29 @@
 import { type FC, useMemo } from "react";
 import classNames from "classnames";
 import type { MerkleDistributorJSON } from "@streamflow/distributor/solana";
-import { PublicKey } from "@solana/web3.js";
-import { getAirdropTypeFromDistributor, shortenPublicKey } from "../utils";
 import { useTokenInfo } from "../hooks/useTokenInfo";
+import {
+  formatTokenAmount,
+  getAirdropTypeFromDistributor,
+  shortenPublicKey,
+} from "../utils";
 
 interface DistributorCardProps extends MerkleDistributorJSON {
-  /** Optional class name for custom styling */
   className?: string;
+  onClick?: () => void;
 }
 
 export const DistributorCard: FC<DistributorCardProps> = ({
   className = "",
+  onClick,
   ...distributor
 }) => {
-  const { tokenInfo } = useTokenInfo(new PublicKey(distributor.mint));
+  const { tokenInfo } = useTokenInfo(distributor.mint);
 
   const airdropType = useMemo(
     () => getAirdropTypeFromDistributor(distributor),
     [distributor]
   );
-
-  const formatTokenAmount = (amount: string): number => {
-    try {
-      return Number(amount) / 10 ** (tokenInfo?.decimals || 9);
-    } catch (error) {
-      console.error("Error formatting token amount:", error);
-      return 0;
-    }
-  };
 
   return (
     <div
@@ -38,10 +33,13 @@ export const DistributorCard: FC<DistributorCardProps> = ({
       )}
       role="button"
       tabIndex={0}
+      onClick={onClick}
       aria-label={`${airdropType} airdrop details`}
     >
       <div className="grid grid-cols-4 gap-4 text-lg font-bold text-white">
-        <div>{shortenPublicKey(distributor.mint)}</div>
+        <div className="flex items-center">
+          {shortenPublicKey(distributor.mint)}
+        </div>
         <div className="flex items-center">
           <span className="capitalize">{airdropType}</span>
         </div>
@@ -55,8 +53,15 @@ export const DistributorCard: FC<DistributorCardProps> = ({
         <div className="text-right">
           <div className="text-sm text-slate-400">Amount</div>
           <div>
-            {formatTokenAmount(distributor.totalAmountClaimed)}/
-            {formatTokenAmount(distributor.totalAmountLocked)}
+            {formatTokenAmount(
+              distributor.totalAmountClaimed,
+              tokenInfo?.decimals || 9
+            )}
+            /
+            {formatTokenAmount(
+              distributor.totalAmountLocked,
+              tokenInfo?.decimals || 9
+            )}
           </div>
         </div>
       </div>

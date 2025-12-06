@@ -80,3 +80,10 @@ export function getAirdropTypeFromDistributor(
   // Otherwise it's instant
   return "instant";
 }
+
+export function formatTokenAmount(
+  amount: string | number,
+  decimals: number = 9
+): number {
+  return Number(amount) / 10 ** decimals;
+}
