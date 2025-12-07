@@ -11,6 +11,7 @@ import { useTokenInfo } from "../hooks/useTokenInfo";
 import { useClaim } from "../hooks/useClaim";
 import { Button } from "../components/ui/Button";
 import { Error } from "../components/ui/Error";
+import { BN } from "bn.js";
 
 export const AirdropPage: FC = () => {
   const params = useParams();
@@ -22,6 +23,7 @@ export const AirdropPage: FC = () => {
     connected,
     isEligible,
     claim,
+    eligibleAmount,
   } = useClaim(params.distributorId);
 
   const type = useMemo(() => {
@@ -30,6 +32,13 @@ export const AirdropPage: FC = () => {
     }
     return "";
   }, [airdrop]);
+
+  const claimableAmount = useMemo(() => {
+    return getNumberFromBN(
+      new BN(eligibleAmount),
+      tokenInfo?.decimals || 9
+    ).toLocaleString();
+  }, [eligibleAmount, tokenInfo]);
 
   if (isLoading) return <Loader />;
 
@@ -111,7 +120,7 @@ export const AirdropPage: FC = () => {
           disabled={!isEligible || isClaimInProgress}
           onClick={() => claim()}
         >
-          Claim
+          Claim {+claimableAmount > 0 && claimableAmount}
         </Button>
       )}
     </>

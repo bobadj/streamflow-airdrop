@@ -4,23 +4,36 @@ import { getNumberFromBN } from "@streamflow/common";
 import type { MerkleDistributor } from "@streamflow/distributor/solana";
 import { useTokenInfo } from "../hooks/useTokenInfo";
 import { getAirdropTypeFromDistributor, shortenPublicKey } from "../utils";
+import { useWallet } from "@solana/wallet-adapter-react";
+import { BN } from "bn.js";
 
 interface DistributorCardProps {
   className?: string;
   onClick?: () => void;
   distributor: MerkleDistributor;
+  eligibility?: string;
 }
 
 export const DistributorCard: FC<DistributorCardProps> = ({
   className,
   onClick,
   distributor,
+  eligibility,
 }) => {
+  const { connected } = useWallet();
   const { tokenInfo } = useTokenInfo(distributor.mint);
 
   const type = useMemo(() => {
     return getAirdropTypeFromDistributor(distributor);
   }, [distributor]);
+
+  const claimableAmount = useMemo(() => {
+    if (!eligibility) return "0";
+    return getNumberFromBN(
+      new BN(eligibility),
+      tokenInfo?.decimals || 9
+    ).toLocaleString();
+  }, [eligibility, tokenInfo]);
 
   const totalAmountClaimed = useMemo(() => {
     if (!distributor?.totalAmountClaimed || !tokenInfo?.decimals) return "0";
@@ -57,7 +70,12 @@ export const DistributorCard: FC<DistributorCardProps> = ({
       tabIndex={0}
       onClick={onClick}
     >
-      <div className="grid grid-cols-4 gap-4 text-lg font-bold text-white">
+      <div
+        className={classNames("grid gap-4 text-lg font-bold text-white", {
+          "grid-cols-5": connected,
+          "grid-cols-4": !connected,
+        })}
+      >
         <div className="flex items-center">
           {shortenPublicKey(distributor.mint.toBase58())}
         </div>
@@ -77,6 +95,12 @@ export const DistributorCard: FC<DistributorCardProps> = ({
             {totalAmountClaimed}/{totalAmountLocked}
           </div>
         </div>
+        {connected && (
+          <div className="text-right">
+            <div className="text-sm text-slate-400">Claimable</div>
+            <div>{claimableAmount}</div>
+          </div>
+        )}
       </div>
     </div>
   );

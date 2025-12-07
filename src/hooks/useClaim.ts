@@ -1,10 +1,11 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { BN } from "bn.js";
 import { useWallet } from "@solana/wallet-adapter-react";
 import type { SignerWalletAdapter } from "@solana/wallet-adapter-base";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import streamflowService from "../services/streamflow.service";
 import { solanaDistributorClient } from "../utils";
+import { useAddressEligibility } from "./useAddressEligibility";
 
 /**
  * centralized hook that handles everything about claiming an airdrop
@@ -18,14 +19,22 @@ export const useClaim = (
   isEligible: boolean;
   isLoading: boolean;
   connected: boolean;
-  eligibleAmount: number;
+  eligibleAmount: string;
 } => {
   const { connected, publicKey, wallet } = useWallet();
+  const { eligibilities } = useAddressEligibility(publicKey);
   const [isEligible, setIsEligible] = useState<boolean>(false);
-  const [eligibleAmount, setEligibleAmount] = useState<number>(0);
+
+  const eligibleAmount = useMemo(() => {
+    if (!address) return "0";
+    return (
+      eligibilities.find((e) => e.distributorAddress === address)
+        ?.amountUnlocked || "0"
+    );
+  }, [eligibilities, address]);
 
   const { data: claimantData, isLoading } = useQuery({
-    queryKey: ["eligible", address, publicKey?.toBase58()],
+    queryKey: ["claimant", address, publicKey?.toBase58()],
     queryFn: async () => {
       if (address && publicKey) {
         try {
@@ -34,19 +43,9 @@ export const useClaim = (
             publicKey.toBase58()
           );
 
-          const allEligible = await streamflowService.getEligibilityForAddress(
-            publicKey.toBase58()
-          );
-
-          const amount = +(
-            allEligible.find((e) => e.distributorAddress === address)
-              ?.amountUnlocked || 0
-          );
-
           setIsEligible(
-            claimantData?.distributorAddress === address && amount > 0
+            claimantData?.distributorAddress === address && +eligibleAmount > 0
           );
-          setEligibleAmount(amount);
 
           return claimantData;
         } catch {

@@ -5,10 +5,14 @@ import { Loader } from "../components/ui/Loader";
 import { DistributorCard } from "../components/DistributorCard";
 import { Icon } from "../components/ui/Icon";
 import { Input } from "../components/ui/Input";
+import { useWallet } from "@solana/wallet-adapter-react";
+import { useAddressEligibility } from "../hooks/useAddressEligibility";
 
 export const HomePage: FC = () => {
   const navigation = useNavigate();
+  const { publicKey } = useWallet();
   const { isLoading, distributors } = useSearchDistributors();
+  const { eligibilities } = useAddressEligibility(publicKey);
   const [searchTerm, setSearchTerm] = useState<string>("");
 
   const filteredDistributors = useMemo(() => {
@@ -37,6 +41,13 @@ export const HomePage: FC = () => {
           <DistributorCard
             key={airdrop.publicKey.toString()}
             distributor={airdrop.account}
+            eligibility={
+              eligibilities.find(
+                (eligibility) =>
+                  eligibility.distributorAddress ===
+                  airdrop.publicKey.toString()
+              )?.amountUnlocked
+            }
             onClick={() =>
               navigation(`/airdrop/${airdrop.publicKey.toString()}`)
             }
