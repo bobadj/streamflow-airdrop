@@ -1,4 +1,4 @@
-import React from "react";
+import type { FC } from "react";
 import { Icon } from "./Icon";
 
 interface BreadcrumbItem {
@@ -10,7 +10,7 @@ interface BreadcrumbsProps {
   items: BreadcrumbItem[];
 }
 
-export const Breadcrumbs: React.FC<BreadcrumbsProps> = ({ items }) => {
+export const Breadcrumbs: FC<BreadcrumbsProps> = ({ items }) => {
   return (
     <nav className="text-gray-500 text-sm mb-3" aria-label="Breadcrumb">
       <ol className="flex items-center">

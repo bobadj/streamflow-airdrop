@@ -10,6 +10,7 @@ import { Icon } from "../components/ui/Icon";
 import { useTokenInfo } from "../hooks/useTokenInfo";
 import { useClaim } from "../hooks/useClaim";
 import { Button } from "../components/ui/Button";
+import { Error } from "../components/ui/Error";
 
 export const AirdropPage: FC = () => {
   const params = useParams();
@@ -33,7 +34,12 @@ export const AirdropPage: FC = () => {
   if (isLoading) return <Loader />;
 
   if (error || !airdrop) {
-    return <div>Could not find airdrop</div>;
+    return (
+      <Error
+        title="Airdrop Not Found"
+        content="The requested airdrop could not be found."
+      />
+    );
   }
 
   return (
