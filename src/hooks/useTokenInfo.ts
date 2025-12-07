@@ -1,11 +1,14 @@
 import { useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Connection, PublicKey } from "@solana/web3.js";
+import { PublicKey } from "@solana/web3.js";
 import { getMint } from "@solana/spl-token";
-import { DEVNET_RPC } from "../utils/definitions";
+import { connection } from "../utils";
 
-const connection = new Connection(DEVNET_RPC);
-
+/**
+ * fetch token info
+ *
+ * @notice uses heavy caching as there is no need to fetch the same data
+ */
 export const useTokenInfo = (mintPubkey: PublicKey | string | undefined) => {
   const mintKey = useMemo(() => {
     return typeof mintPubkey === "string"

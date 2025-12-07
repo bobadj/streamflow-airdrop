@@ -2,6 +2,7 @@ import {
   type MerkleDistributor,
   SolanaDistributorClient,
 } from "@streamflow/distributor/solana";
+import { Connection } from "@solana/web3.js";
 import { ICluster } from "@streamflow/common";
 import { DEVNET_RPC } from "../utils/definitions";
 
@@ -76,3 +77,5 @@ export const solanaDistributorClient = new SolanaDistributorClient({
   cluster: ICluster.Devnet,
   apiUrl: DEVNET_RPC,
 });
+
+export const connection = new Connection(DEVNET_RPC);

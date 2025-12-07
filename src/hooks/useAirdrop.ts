@@ -3,6 +3,11 @@ import { solanaDistributorClient } from "../utils";
 import type { MerkleDistributorWithMeta } from "../utils/definitions";
 import streamflowService from "../services/streamflow.service";
 
+/**
+ * Find a specific airdrop by address
+ *
+ * @notice will attach `meta` - data received from Streamflow Public API about airdrop
+ */
 export const useAirdrop = (
   address: string | undefined
 ): {

@@ -1,6 +1,7 @@
 import type {
   StreamflowClaimantSchema,
   StreamflowDistributorSchema,
+  StreamflowEligibilitySchema,
 } from "../utils/definitions";
 
 class StreamflowService {
@@ -9,7 +10,8 @@ class StreamflowService {
 
   private async fetch<T>(
     path: string = "",
-    params?: Record<string, string | number | string[]>
+    params?: Record<string, string | number | string[]>,
+    method: "GET" | "POST" = "GET"
   ): Promise<T> {
     const searchParams = new URLSearchParams({
       ...Object.entries(params || {}).reduce((acc, [k, v]) => {
@@ -18,8 +20,22 @@ class StreamflowService {
       }, {} as Record<string, string>),
     });
 
-    const url = `${this.baseUrl}/${path}?${searchParams.toString()}`;
-    const res = await fetch(url);
+    let url = `${this.baseUrl}/${path}`;
+    if (method === "GET") {
+      url += `?${searchParams.toString()}`;
+    }
+
+    const res = await fetch(url, {
+      method,
+      ...(method === "POST"
+        ? {
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(params),
+          }
+        : {}),
+    });
     const json = await res.json();
 
     return json as T;
@@ -38,6 +54,16 @@ class StreamflowService {
   async getIsEligible(distributorAddress: string, claimantAddress: string) {
     return await this.fetch<StreamflowClaimantSchema>(
       `airdrops/${distributorAddress}/claimants/${claimantAddress}`
+    );
+  }
+
+  async getEligibilityForAddress(address: string) {
+    return this.fetch<Array<StreamflowEligibilitySchema>>(
+      "airdrops/check-eligibility",
+      {
+        claimantAddresses: [address],
+      },
+      "POST"
     );
   }
 }

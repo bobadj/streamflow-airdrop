@@ -16,10 +16,12 @@ export const AirdropPage: FC = () => {
 
   const { isLoading, airdrop, error } = useAirdrop(params.distributorId);
   const { tokenInfo } = useTokenInfo(airdrop?.mint);
-  const { connected, isEligible, claim } = useClaim(
-    params.distributorId,
-    airdrop?.maxNumNodes.toNumber() || 0
-  );
+  const {
+    isLoading: isClaimInProgress,
+    connected,
+    isEligible,
+    claim,
+  } = useClaim(params.distributorId);
 
   const type = useMemo(() => {
     if (airdrop) {
@@ -99,7 +101,10 @@ export const AirdropPage: FC = () => {
           </p>
         </div>
       ) : (
-        <Button disabled={!isEligible} onClick={() => claim()}>
+        <Button
+          disabled={!isEligible || isClaimInProgress}
+          onClick={() => claim()}
+        >
           Claim
         </Button>
       )}

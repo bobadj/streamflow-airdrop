@@ -6,9 +6,23 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import streamflowService from "../services/streamflow.service";
 import { solanaDistributorClient } from "../utils";
 
-export const useClaim = (address: string | undefined, maxNumNodes: number) => {
+/**
+ * centralized hook that handles everything about claiming an airdrop
+ *
+ * It provides a boolean if the address is eligible for claiming and the actual claim handler
+ */
+export const useClaim = (
+  address: string | undefined
+): {
+  claim: () => void;
+  isEligible: boolean;
+  isLoading: boolean;
+  connected: boolean;
+  eligibleAmount: number;
+} => {
   const { connected, publicKey, wallet } = useWallet();
   const [isEligible, setIsEligible] = useState<boolean>(false);
+  const [eligibleAmount, setEligibleAmount] = useState<number>(0);
 
   const { data: claimantData, isLoading } = useQuery({
     queryKey: ["eligible", address, publicKey?.toBase58()],
@@ -17,10 +31,22 @@ export const useClaim = (address: string | undefined, maxNumNodes: number) => {
         try {
           const claimantData = await streamflowService.getIsEligible(
             address,
-            publicKey?.toBase58()
+            publicKey.toBase58()
           );
 
-          setIsEligible(claimantData?.distributorAddress === address);
+          const allEligible = await streamflowService.getEligibilityForAddress(
+            publicKey.toBase58()
+          );
+
+          const amount = +(
+            allEligible.find((e) => e.distributorAddress === address)
+              ?.amountUnlocked || 0
+          );
+
+          setIsEligible(
+            claimantData?.distributorAddress === address && amount > 0
+          );
+          setEligibleAmount(amount);
 
           return claimantData;
         } catch {
@@ -45,7 +71,7 @@ export const useClaim = (address: string | undefined, maxNumNodes: number) => {
           proof: claimantData.proof,
           amountUnlocked: new BN(claimantData.amountUnlocked),
           amountLocked: new BN(claimantData.amountLocked),
-          claimableAmount: new BN(+claimantData.amountUnlocked / maxNumNodes), // ??
+          claimableAmount: new BN(eligibleAmount), // ??
         },
         {
           invoker: wallet.adapter as SignerWalletAdapter,
@@ -59,5 +85,6 @@ export const useClaim = (address: string | undefined, maxNumNodes: number) => {
     isEligible,
     isLoading,
     connected,
+    eligibleAmount,
   };
 };

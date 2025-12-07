@@ -9,6 +9,9 @@ import {
   solanaDistributorClient,
 } from "../utils";
 
+/**
+ * search available airdrops
+ */
 export const useSearchDistributors = (
   params: ISearchDistributors = {}
 ): {

@@ -33,6 +33,15 @@ export interface StreamflowDistributorSchema {
   version: number;
 }
 
+export interface StreamflowEligibilitySchema {
+  chain: string;
+  distributorAddress: string;
+  address: string;
+  amountUnlocked: string;
+  amountLocked: string;
+  amountClaimed: string;
+}
+
 export interface StreamflowClaimantSchema {
   chain: string;
   distributorAddress: string;
