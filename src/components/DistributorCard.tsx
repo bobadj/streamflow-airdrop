@@ -12,7 +12,7 @@ interface DistributorCardProps {
 }
 
 export const DistributorCard: FC<DistributorCardProps> = ({
-  className = "",
+  className,
   onClick,
   distributor,
 }) => {
@@ -22,6 +22,29 @@ export const DistributorCard: FC<DistributorCardProps> = ({
     return getAirdropTypeFromDistributor(distributor);
   }, [distributor]);
 
+  const totalAmountClaimed = useMemo(() => {
+    if (!distributor?.totalAmountClaimed || !tokenInfo?.decimals) return "0";
+    return getNumberFromBN(
+      distributor.totalAmountClaimed,
+      tokenInfo.decimals
+    ).toLocaleString();
+  }, [distributor.totalAmountClaimed, tokenInfo]);
+
+  const totalAmountLocked = useMemo(() => {
+    const value =
+      type === "instant"
+        ? distributor.maxTotalClaim
+        : distributor.totalAmountLocked;
+    if (!value || !tokenInfo?.decimals) return "0";
+
+    return getNumberFromBN(value, tokenInfo?.decimals || 9);
+  }, [
+    type,
+    distributor.maxTotalClaim,
+    distributor.totalAmountLocked,
+    tokenInfo,
+  ]);
+
   return (
     <div
       className={classNames(
@@ -29,9 +52,10 @@ export const DistributorCard: FC<DistributorCardProps> = ({
         className
       )}
       role="button"
+      aria-label={`View ${type} airdrop details`}
+      aria-describedby="distributor-amounts"
       tabIndex={0}
       onClick={onClick}
-      aria-label={`${type} airdrop details`}
     >
       <div className="grid grid-cols-4 gap-4 text-lg font-bold text-white">
         <div className="flex items-center">
@@ -50,17 +74,7 @@ export const DistributorCard: FC<DistributorCardProps> = ({
         <div className="text-right">
           <div className="text-sm text-slate-400">Amount</div>
           <div>
-            {getNumberFromBN(
-              distributor.totalAmountClaimed,
-              tokenInfo?.decimals || 9
-            )}
-            /
-            {getNumberFromBN(
-              type === "instant"
-                ? distributor.maxTotalClaim
-                : distributor.totalAmountLocked,
-              tokenInfo?.decimals || 9
-            )}
+            {totalAmountClaimed}/{totalAmountLocked}
           </div>
         </div>
       </div>

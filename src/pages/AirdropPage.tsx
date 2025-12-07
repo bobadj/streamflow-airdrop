@@ -76,7 +76,7 @@ export const AirdropPage: FC = () => {
           value={[
             airdrop.numNodesClaimed.toString(),
             airdrop.maxNumNodes.toString(),
-          ].join("/")}
+          ]}
           icon={<Icon title="group_work" />}
         />
         <StatsCard
@@ -92,7 +92,7 @@ export const AirdropPage: FC = () => {
                 : airdrop.totalAmountLocked,
               tokenInfo?.decimals || 9
             ),
-          ].join("/")}
+          ]}
           icon={<Icon title="token" />}
         />
       </div>

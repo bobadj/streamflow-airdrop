@@ -3,7 +3,7 @@ import type { IconProps } from "./ui/Icon";
 
 interface StatsCardProps {
   title: string;
-  value: string;
+  value: string | (string | number)[];
   change?: string;
   icon?: ReactElement<IconProps>;
 }
@@ -27,7 +27,9 @@ export const StatsCard: FC<StatsCardProps> = ({
         )}
       </div>
       <h3 className="text-slate-400 text-sm mb-1">{title}</h3>
-      <p className="text-2xl font-bold text-white">{value}</p>
+      <p className="text-2xl font-bold text-white">
+        {Array.isArray(value) ? value.join("/") : value}
+      </p>
     </div>
   );
 };
