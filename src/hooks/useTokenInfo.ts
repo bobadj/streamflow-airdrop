@@ -1,32 +1,31 @@
+import { useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Connection, PublicKey } from "@solana/web3.js";
 import { getMint } from "@solana/spl-token";
 import { DEVNET_RPC } from "../utils/definitions";
-import { useMemo } from "react";
 
 const connection = new Connection(DEVNET_RPC);
 
-export const useTokenInfo = (mintPubkey: PublicKey | string) => {
-  const mintKeyString = useMemo(() => {
+export const useTokenInfo = (mintPubkey: PublicKey | string | undefined) => {
+  const mintKey = useMemo(() => {
     return typeof mintPubkey === "string"
       ? new PublicKey(mintPubkey)
       : mintPubkey;
   }, [mintPubkey]);
 
   const { data: tokenInfo, isLoading } = useQuery({
-    queryKey: ["tokenInfo", mintKeyString.toBase58()],
+    queryKey: ["tokenInfo", mintKey?.toBase58()],
     queryFn: async () => {
       // SOL special case
       if (
-        mintKeyString.toBase58() ===
-        "So11111111111111111111111111111111111111112"
+        mintKey?.toBase58() === "So11111111111111111111111111111111111111112"
       ) {
         return {
           decimals: 9,
         };
       }
 
-      return await getMint(connection, mintKeyString);
+      return await getMint(connection, mintKey!);
     },
     retry: false,
     refetchOnWindowFocus: false,

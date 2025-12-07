@@ -1,4 +1,5 @@
 import { Layout } from "../components/ui/Layout";
+import { AirdropPage } from "../pages/AirdropPage";
 import { HomePage } from "../pages/HomePage";
 
 export const routes = [
@@ -11,8 +12,8 @@ export const routes = [
         element: <HomePage />,
       },
       {
-        path: "airdrop/:id",
-        element: <div>Airdrop Detail</div>,
+        path: "airdrop/:distributorId",
+        element: <AirdropPage />,
       },
     ],
   },

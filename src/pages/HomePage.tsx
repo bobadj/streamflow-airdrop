@@ -17,7 +17,7 @@ export const HomePage: FC = () => {
         {distributors.map((airdrop) => (
           <DistributorCard
             key={airdrop.publicKey.toString()}
-            {...airdrop.account.toJSON()}
+            distributor={airdrop.account}
             onClick={() =>
               navigation(`/airdrop/${airdrop.publicKey.toString()}`)
             }

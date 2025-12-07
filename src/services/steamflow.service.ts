@@ -6,10 +6,10 @@ class SteamflowService {
 
   private async fetch<T>(
     path: string = "",
-    params: Record<string, string | number | string[]>
+    params?: Record<string, string | number | string[]>
   ): Promise<T> {
     const searchParams = new URLSearchParams({
-      ...Object.entries(params).reduce((acc, [k, v]) => {
+      ...Object.entries(params || {}).reduce((acc, [k, v]) => {
         acc[k] = Array.isArray(v) ? v.join(",") : String(v);
         return acc;
       }, {} as Record<string, string>),
@@ -26,6 +26,10 @@ class SteamflowService {
     return this.fetch<Array<StreamflowDistributorSchema>>("airdrops", {
       addresses,
     });
+  }
+
+  async getDistributor(address: string) {
+    return await this.fetch<StreamflowDistributorSchema>(`airdrops/${address}`);
   }
 }
 

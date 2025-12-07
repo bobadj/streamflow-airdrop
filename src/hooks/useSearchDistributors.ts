@@ -1,10 +1,10 @@
-import type {
-  ISearchDistributors,
+import {
   MerkleDistributor,
+  type ISearchDistributors,
 } from "@streamflow/distributor/solana";
 import { useQuery } from "@tanstack/react-query";
-import { solanaDistributorClient } from "../lib/steamflow";
 import type { IProgramAccount } from "@streamflow/common";
+import { solanaDistributorClient } from "../lib/steamflow";
 
 export const useSearchDistributors = (
   params: ISearchDistributors = {}
@@ -21,25 +21,22 @@ export const useSearchDistributors = (
         params
       );
 
-      return allDistributors.filter((distributor) => {
-        const a = distributor.account;
+      return allDistributors
+        .filter((distributor) => {
+          const a = distributor.account;
 
-        const active =
-          !a.clawedBack &&
-          a.startTs.toNumber() <= now &&
-          now <= a.endTs.toNumber();
+          const start = Number(a.startTs);
+          const end = Number(a.endTs);
 
-        const claimable =
-          a.totalAmountClaimed.lt(a.maxTotalClaim) &&
-          a.numNodesClaimed.lt(a.maxNumNodes);
-
-        const hasClaims =
-          a.claimsLimit === 0 || a.claimsLimit > a.numNodesClaimed.toNumber();
-
-        return (
-          active && claimable && hasClaims && a.totalAmountLocked.toNumber() > 0
-        );
-      });
+          if (now < start) return false;
+          if (now > end) return false;
+          return true;
+        })
+        .sort((a, b) => {
+          const aStart = Number(a.account.startTs);
+          const bStart = Number(b.account.startTs);
+          return bStart - aStart;
+        });
     },
     retry: false,
     refetchOnWindowFocus: false,

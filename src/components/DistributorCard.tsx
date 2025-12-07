@@ -1,29 +1,26 @@
-import { type FC, useMemo } from "react";
+import { useMemo, type FC } from "react";
 import classNames from "classnames";
-import type { MerkleDistributorJSON } from "@streamflow/distributor/solana";
+import { getNumberFromBN } from "@streamflow/common";
+import type { MerkleDistributor } from "@streamflow/distributor/solana";
 import { useTokenInfo } from "../hooks/useTokenInfo";
-import {
-  formatTokenAmount,
-  getAirdropTypeFromDistributor,
-  shortenPublicKey,
-} from "../utils";
+import { getAirdropTypeFromDistributor, shortenPublicKey } from "../utils";
 
-interface DistributorCardProps extends MerkleDistributorJSON {
+interface DistributorCardProps {
   className?: string;
   onClick?: () => void;
+  distributor: MerkleDistributor;
 }
 
 export const DistributorCard: FC<DistributorCardProps> = ({
   className = "",
   onClick,
-  ...distributor
+  distributor,
 }) => {
   const { tokenInfo } = useTokenInfo(distributor.mint);
 
-  const airdropType = useMemo(
-    () => getAirdropTypeFromDistributor(distributor),
-    [distributor]
-  );
+  const type = useMemo(() => {
+    return getAirdropTypeFromDistributor(distributor);
+  }, [distributor]);
 
   return (
     <div
@@ -34,14 +31,14 @@ export const DistributorCard: FC<DistributorCardProps> = ({
       role="button"
       tabIndex={0}
       onClick={onClick}
-      aria-label={`${airdropType} airdrop details`}
+      aria-label={`${type} airdrop details`}
     >
       <div className="grid grid-cols-4 gap-4 text-lg font-bold text-white">
         <div className="flex items-center">
-          {shortenPublicKey(distributor.mint)}
+          {shortenPublicKey(distributor.mint.toBase58())}
         </div>
         <div className="flex items-center">
-          <span className="capitalize">{airdropType}</span>
+          <span className="capitalize">{type}</span>
         </div>
         <div className="text-center">
           <div className="text-sm text-slate-400">Nodes</div>
@@ -53,13 +50,15 @@ export const DistributorCard: FC<DistributorCardProps> = ({
         <div className="text-right">
           <div className="text-sm text-slate-400">Amount</div>
           <div>
-            {formatTokenAmount(
+            {getNumberFromBN(
               distributor.totalAmountClaimed,
               tokenInfo?.decimals || 9
             )}
             /
-            {formatTokenAmount(
-              distributor.totalAmountLocked,
+            {getNumberFromBN(
+              type === "instant"
+                ? distributor.maxTotalClaim
+                : distributor.totalAmountLocked,
               tokenInfo?.decimals || 9
             )}
           </div>

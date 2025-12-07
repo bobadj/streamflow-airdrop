@@ -1,4 +1,4 @@
-import type { MerkleDistributorJSON } from "@streamflow/distributor/solana";
+import type { MerkleDistributor } from "@streamflow/distributor/solana";
 import type { AirdropType } from "./definitions";
 
 /**
@@ -36,54 +36,18 @@ export function chunkArray<T>(arr: T[], size: number): T[][] {
 }
 
 /**
- * returns "instant" or "vesting" based on unlockPeriod and totalAmountLocked
- */
-export function getAirdropType({
-  totalAmountLocked,
-  startVestingTs,
-  endVestingTs,
-  claimsLimit,
-}: {
-  totalAmountLocked: string;
-  startVestingTs: number;
-  endVestingTs: number;
-  claimsLimit: number | null;
-}): AirdropType {
-  const locked = Number(totalAmountLocked);
-  const start = startVestingTs;
-  const end = endVestingTs;
-
-  if (locked > 0) return "vesting";
-  if (start !== end) return "vesting";
-  if (Number(claimsLimit) > 1) return "vesting";
-
-  return "instant";
-}
-
-/**
  * returns "instant" or "vesting" based on distributor data
  */
 export function getAirdropTypeFromDistributor(
-  distributor: MerkleDistributorJSON
+  distributor: Omit<MerkleDistributor, "toJSON">
 ): AirdropType {
-  const locked = +distributor.totalAmountLocked;
-  const start = distributor.startTs;
-  const end = distributor.endTs;
-  const claimsLimit = distributor.claimsLimit;
-  const unlockPeriod = +distributor.unlockPeriod;
+  const start = Number(distributor.startTs);
+  const end = Number(distributor.endTs);
 
-  if (locked > 0) return "vesting";
-  if (start !== end) return "vesting";
-  if (claimsLimit > 1) return "vesting";
-  if (unlockPeriod > 1) return "vesting";
+  const totalLocked = distributor.totalAmountLocked.toNumber() ?? 0;
 
-  // Otherwise it's instant
-  return "instant";
-}
+  if (start === end) return "instant";
+  if (totalLocked === 0) return "instant";
 
-export function formatTokenAmount(
-  amount: string | number,
-  decimals: number = 9
-): number {
-  return Number(amount) / 10 ** decimals;
+  return "vesting";
 }

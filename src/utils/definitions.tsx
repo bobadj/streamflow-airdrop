@@ -1,3 +1,5 @@
+import type { MerkleDistributor } from "@streamflow/distributor/solana";
+
 export interface StreamflowDistributorSchema {
   address: string;
   chain: "SOLANA";
@@ -34,3 +36,7 @@ export interface StreamflowDistributorSchema {
 export type AirdropType = "instant" | "vesting";
 
 export const DEVNET_RPC = "https://api.devnet.solana.com";
+
+export type MerkleDistributorWithMeta = MerkleDistributor & {
+  meta: StreamflowDistributorSchema | null;
+};
