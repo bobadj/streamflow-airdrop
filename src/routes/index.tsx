@@ -1,4 +1,4 @@
-import { Layout } from "../components/ui/Layout";
+import { Layout } from "../components/Layout";
 import { AirdropPage } from "../pages/AirdropPage";
 import { HomePage } from "../pages/HomePage";
 

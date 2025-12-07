@@ -1,6 +1,6 @@
 import type { FC } from "react";
 import { Outlet } from "react-router-dom";
-import { ConnectWallet } from "../ConnectWallet";
+import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
 
 export const Layout: FC = () => {
   return (
@@ -9,7 +9,7 @@ export const Layout: FC = () => {
 
       <main className="container mx-auto px-6 py-5 relative min-h-screen h-full flex flex-col text-white">
         <div className="flex justify-end my-5">
-          <ConnectWallet />
+          <WalletMultiButton />
         </div>
 
         <Outlet />
