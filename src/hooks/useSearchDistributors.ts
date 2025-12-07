@@ -4,7 +4,7 @@ import {
 } from "@streamflow/distributor/solana";
 import { useQuery } from "@tanstack/react-query";
 import type { IProgramAccount } from "@streamflow/common";
-import { solanaDistributorClient } from "../lib/steamflow";
+import { solanaDistributorClient } from "../lib/streamflow";
 
 export const useSearchDistributors = (
   params: ISearchDistributors = {}

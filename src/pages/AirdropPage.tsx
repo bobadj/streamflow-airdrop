@@ -1,7 +1,5 @@
 import { useMemo, type FC } from "react";
-import classNames from "classnames";
 import { useParams } from "react-router-dom";
-import { useWallet } from "@solana/wallet-adapter-react";
 import { getNumberFromBN } from "@streamflow/common";
 import { useAirdrop } from "../hooks/useAirdrop";
 import { Loader } from "../components/ui/Loader";
@@ -10,13 +8,18 @@ import { StatsCard } from "../components/StatsCard";
 import { getAirdropTypeFromDistributor, shortenPublicKey } from "../utils";
 import { Icon } from "../components/ui/Icon";
 import { useTokenInfo } from "../hooks/useTokenInfo";
+import { useClaim } from "../hooks/useClaim";
+import { Button } from "../components/ui/Button";
 
 export const AirdropPage: FC = () => {
   const params = useParams();
-  const { connected } = useWallet();
 
-  const { isLoading, airdrop, error } = useAirdrop(params.distributorId!);
+  const { isLoading, airdrop, error } = useAirdrop(params.distributorId);
   const { tokenInfo } = useTokenInfo(airdrop?.mint);
+  const { connected, isEligible, claim } = useClaim(
+    params.distributorId,
+    airdrop?.maxNumNodes.toNumber() || 0
+  );
 
   const type = useMemo(() => {
     if (airdrop) {
@@ -96,20 +99,9 @@ export const AirdropPage: FC = () => {
           </p>
         </div>
       ) : (
-        <button
-          className={classNames(
-            "w-full py-3 rounded-xl font-medium transition-all",
-            {
-              "bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 text-white":
-                connected,
-            },
-            {
-              "bg-slate-700/50 text-slate-400 cursor-not-allowed": !connected,
-            }
-          )}
-        >
+        <Button disabled={!isEligible} onClick={() => claim()}>
           Claim
-        </button>
+        </Button>
       )}
     </>
   );

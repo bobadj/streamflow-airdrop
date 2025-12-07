@@ -33,6 +33,15 @@ export interface StreamflowDistributorSchema {
   version: number;
 }
 
+export interface StreamflowClaimantSchema {
+  chain: string;
+  distributorAddress: string;
+  address: string;
+  amountUnlocked: string;
+  amountLocked: string;
+  proof: number[][];
+}
+
 export type AirdropType = "instant" | "vesting";
 
 export const DEVNET_RPC = "https://api.devnet.solana.com";

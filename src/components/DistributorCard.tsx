@@ -25,7 +25,7 @@ export const DistributorCard: FC<DistributorCardProps> = ({
   return (
     <div
       className={classNames(
-        'cursor-pointer bg-slate-800/50 backdrop-blur-sm border border-slate-700 rounded-2xl" p-6 hover:border-cyan-500/50 transition-all duration-300 hover:shadow-lg hover:shadow-cyan-500/10 group',
+        "cursor-pointer bg-slate-800/50 backdrop-blur-sm border border-slate-700 rounded-2xl p-6 hover:border-cyan-500/50 transition-all duration-300 hover:shadow-lg hover:shadow-cyan-500/10 group",
         className
       )}
       role="button"

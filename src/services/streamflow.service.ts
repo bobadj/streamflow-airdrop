@@ -1,6 +1,9 @@
-import type { StreamflowDistributorSchema } from "../utils/definitions";
+import type {
+  StreamflowClaimantSchema,
+  StreamflowDistributorSchema,
+} from "../utils/definitions";
 
-class SteamflowService {
+class StreamflowService {
   private readonly baseUrl: string =
     "https://staging-api-public.streamflow.finance/v2/api";
 
@@ -31,8 +34,14 @@ class SteamflowService {
   async getDistributor(address: string) {
     return await this.fetch<StreamflowDistributorSchema>(`airdrops/${address}`);
   }
+
+  async getIsEligible(distributorAddress: string, claimantAddress: string) {
+    return await this.fetch<StreamflowClaimantSchema>(
+      `airdrops/${distributorAddress}/claimants/${claimantAddress}`
+    );
+  }
 }
 
-const steamflowService = new SteamflowService();
+const streamflowService = new StreamflowService();
 
-export default steamflowService;
+export default streamflowService;

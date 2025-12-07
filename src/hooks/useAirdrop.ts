@@ -1,10 +1,10 @@
 import { useQuery } from "@tanstack/react-query";
-import { solanaDistributorClient } from "../lib/steamflow";
+import { solanaDistributorClient } from "../lib/streamflow";
 import type { MerkleDistributorWithMeta } from "../utils/definitions";
-import steamflowService from "../services/steamflow.service";
+import streamflowService from "../services/streamflow.service";
 
 export const useAirdrop = (
-  address: string
+  address: string | undefined
 ): {
   airdrop: MerkleDistributorWithMeta | null;
   isLoading: boolean;
@@ -17,19 +17,24 @@ export const useAirdrop = (
   } = useQuery({
     queryKey: ["airdrop", address],
     queryFn: async () => {
-      const result = await solanaDistributorClient.getDistributors({
-        ids: [address],
-      });
-      const distributor = (result?.[0] || null) as MerkleDistributorWithMeta;
+      if (address) {
+        const result = await solanaDistributorClient.getDistributors({
+          ids: [address],
+        });
+        const distributor = (result?.[0] || null) as MerkleDistributorWithMeta;
 
-      if (distributor) {
-        distributor.meta = await steamflowService.getDistributor(address);
+        if (distributor) {
+          distributor.meta = await streamflowService.getDistributor(address);
+        }
+
+        return distributor;
       }
 
-      return distributor;
+      return null;
     },
     retry: false,
     refetchOnWindowFocus: false,
+    enabled: !!address,
   });
 
   return {
