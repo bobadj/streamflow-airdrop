@@ -1,4 +1,10 @@
-import type { MerkleDistributor } from "@streamflow/distributor/solana";
+import {
+  type MerkleDistributor,
+  SolanaDistributorClient,
+} from "@streamflow/distributor/solana";
+import { ICluster } from "@streamflow/common";
+import { DEVNET_RPC } from "../utils/definitions";
+
 import type { AirdropType } from "./definitions";
 
 /**
@@ -51,3 +57,22 @@ export function getAirdropTypeFromDistributor(
 
   return "vesting";
 }
+
+/**
+ * debounce function
+ */
+export const debounce = (callback: CallableFunction, wait: number = 300) => {
+  let timeoutId: NodeJS.Timeout;
+  return (...args: unknown[]) => {
+    clearTimeout(timeoutId);
+    timeoutId = setTimeout(() => {
+      callback(...args);
+    }, wait);
+  };
+};
+
+export const solanaDistributorClient = new SolanaDistributorClient({
+  clusterUrl: DEVNET_RPC,
+  cluster: ICluster.Devnet,
+  apiUrl: DEVNET_RPC,
+});

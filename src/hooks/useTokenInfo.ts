@@ -16,7 +16,7 @@ export const useTokenInfo = (mintPubkey: PublicKey | string | undefined) => {
   const { data: tokenInfo, isLoading } = useQuery({
     queryKey: ["tokenInfo", mintKey?.toBase58()],
     queryFn: async () => {
-      // SOL special case
+      // SOL
       if (
         mintKey?.toBase58() === "So11111111111111111111111111111111111111112"
       ) {

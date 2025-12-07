@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { solanaDistributorClient } from "../lib/streamflow";
+import { solanaDistributorClient } from "../utils";
 import type { MerkleDistributorWithMeta } from "../utils/definitions";
 import streamflowService from "../services/streamflow.service";
 

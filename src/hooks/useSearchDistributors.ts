@@ -4,7 +4,10 @@ import {
 } from "@streamflow/distributor/solana";
 import { useQuery } from "@tanstack/react-query";
 import type { IProgramAccount } from "@streamflow/common";
-import { solanaDistributorClient } from "../lib/streamflow";
+import {
+  getAirdropTypeFromDistributor,
+  solanaDistributorClient,
+} from "../utils";
 
 export const useSearchDistributors = (
   params: ISearchDistributors = {}
@@ -15,22 +18,19 @@ export const useSearchDistributors = (
   const { data: distributors, isLoading } = useQuery({
     queryKey: ["distributors", params.admin, params.mint],
     queryFn: async () => {
-      const now = Math.floor(Date.now() / 1000);
-
       const allDistributors = await solanaDistributorClient.searchDistributors(
         params
       );
 
       return allDistributors
         .filter((distributor) => {
-          const a = distributor.account;
+          const d = distributor.account;
 
-          const start = Number(a.startTs);
-          const end = Number(a.endTs);
-
-          if (now < start) return false;
-          if (now > end) return false;
-          return true;
+          let val = d.totalAmountLocked;
+          if (getAirdropTypeFromDistributor(d) === "instant") {
+            val = d.maxTotalClaim;
+          }
+          return d.totalAmountClaimed.lt(val);
         })
         .sort((a, b) => {
           const aStart = Number(a.account.startTs);

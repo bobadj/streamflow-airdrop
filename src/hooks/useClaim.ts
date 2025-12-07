@@ -4,7 +4,7 @@ import { useWallet } from "@solana/wallet-adapter-react";
 import type { SignerWalletAdapter } from "@solana/wallet-adapter-base";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import streamflowService from "../services/streamflow.service";
-import { solanaDistributorClient } from "../lib/streamflow";
+import { solanaDistributorClient } from "../utils";
 
 export const useClaim = (address: string | undefined, maxNumNodes: number) => {
   const { connected, publicKey, wallet } = useWallet();
